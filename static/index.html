@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <script src="./js/svg-pan-zoom.js"></script>
+  </head>
+
+  <body>
+    <script>
+	var lastZoom = null;
+	var lastPan = null;
+	var panZoom = null;
+	var lastViewBox = null;
+	var viewBox = null;
+
+	function onPan(pan) {
+	    lastPan = pan;
+	}
+
+	function onZoom(zoom) {
+	    lastZoom = zoom;
+	    lastPan = panZoom.getPan();
+	}
+
+	function embed_onload() {
+	    panZoom = svgPanZoom('#svg-graph', {
+	      zoomEnabled: true,
+	      controlIconsEnabled: true,
+	      zoomScaleSensitivity: 1,
+	      onPan: onPan,
+	      onZoom: onZoom,
+	      maxZoom: 30
+	    });
+
+	    lastViewBox = viewBox;
+	    viewBox = panZoom.getSizes()['viewBox']
+	    
+	    if (lastZoom != null) {
+		var scale = 1.0;
+		if (lastViewBox != null) {
+		    scale = Math.sqrt(viewBox.width*viewBox.width + viewBox.height*viewBox.height) / Math.sqrt(lastViewBox.width*lastViewBox.width + lastViewBox.height*lastViewBox.height)
+		}
+		panZoom.zoom(scale*lastZoom);
+	    }
+
+	    if (lastPan != null) {
+		var scalew = 1.0, scaleh = 1.0;
+		if (lastViewBox != null) {
+		    scalew = viewBox.width / lastViewBox.width;
+		    scaleh = viewBox.height / lastViewBox.height;
+		}
+		panZoom.pan(lastPan);
+	    }
+
+	}
+    </script>
+    <div style="position: absolute; left:0; top:0; right:0; bottom:0; margin: 10px; ">
+	<embed onload="embed_onload()" id="svg-graph" type="image/svg+xml" style="width: 100%; height: 100%; border:1px solid black; " src="http://localhost:5000/api/cfg/0x401050" />
+    </div>
+  </body>
+</html>
+
