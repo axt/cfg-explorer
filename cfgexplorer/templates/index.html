@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./js/svg-pan-zoom.js"></script>
+  </head>
+
+  <body>
+    <script>
+	function embed_onload() {
+	    panZoom = svgPanZoom('#svg-graph', {
+	      zoomEnabled: true,
+	      controlIconsEnabled: true,
+	      zoomScaleSensitivity: 0.5,
+	    });
+	}
+    </script>
+    <div style="position: absolute; left:0; top:0; right:0; bottom:0; margin: 10px; ">
+	<embed onload="embed_onload()" id="svg-graph" type="image/svg+xml" style="width: 100%; height: 100%; border:1px solid black; " src="{{start_url}}" />
+    </div>
+  </body>
+</html>
+

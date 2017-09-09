@@ -18,7 +18,7 @@ class CFGExplorerCLI(object):
         self.args = self.parser.parse_args()
         self._create_cfg()
         self._launch()
-        self.app = CFGExplorer(port=self.args.port)
+        self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
         self.add_endpoints()
 
     def run(self):
