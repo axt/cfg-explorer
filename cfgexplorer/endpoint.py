@@ -74,4 +74,5 @@ class FGraphVisEndpoint(VisEndpoint):
         vis.add_node_annotator(XRefFunctions(self.name))
     
     def process_vis(self, vis, addr):
-        vis.process(kb[addr].transition_graph)
+        #import IPython; IPython.embed()
+        vis.process(self.kb.functions[addr].transition_graph)

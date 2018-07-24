@@ -3,6 +3,8 @@ l = logging.getLogger('axt.cfgexplorer')
 
 import argparse
 import angr
+import os
+
 from .explorer import CFGExplorer
 from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
 
@@ -78,7 +80,7 @@ class CFGExplorerCLI(object):
                 else:
                     l.warning("Starting address unrecognized %s", s)
                 
-            self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=False, function_prologues=False, force_complete_scan=False, collect_data_references=False, start_at_entry=False, function_starts = addrs, resolve_indirect_jumps=True)
+            self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=False, function_prologues=False, force_complete_scan=False, collect_data_references=False, start_at_entry=False, function_starts = self.addrs, resolve_indirect_jumps=True)
 
     def _postprocess_cfg(self):
         pass
@@ -87,12 +89,13 @@ class CFGExplorerCLI(object):
         if self.args.launch:
             try:
                 for addr in self.addrs:
-                    os.system('xdg-open http://localhost:%d/function/%#x' % (args.port, addr))
-            except:
+                    os.system('xdg-open http://localhost:%d/' % (self.args.port))
+            except Exception as e:
+                print(e)
                 pass
         else:
             for addr in self.addrs:
-                l.info('http://localhost:%d/api/cfg/%#x' % (self.args.port, addr))
+                l.info('http://localhost:%d/' % (self.args.port))
 
     def add_endpoints(self):
         self.app.add_vis_endpoint(CFGVisEndpoint('cfg', self.cfg))
