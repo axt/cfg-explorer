@@ -1,4 +1,5 @@
 import logging
+
 l = logging.getLogger('axt.cfgexplorer')
 
 import argparse
@@ -7,22 +8,42 @@ import os
 
 from .explorer import CFGExplorer
 from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
+from networkx.drawing.nx_agraph import write_dot
+
 
 class CFGExplorerCLI(object):
-    
+
     def __init__(self):
         self.parser = None
         self.args = None
         self.project = None
         self.cfg = None
-        
+
         self._create_parser()
         self.args = self.parser.parse_args()
+
+        self.ext = 'svg'
+        self.fname = ''
+        if not self.args.outfile:
+            self.fname, self.ext = os.path.splitext(self.args.outfile)
+            if self.ext != '.svg' and self.ext != '.dot':
+                l.error('Wrong output file foramt! Only support for .svg and .dot')
+                raise Exception('Invalid Input')
+
         self._create_cfg()
-        self._postprocess_cfg()
-        self._launch()
-        self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
-        self.add_endpoints()
+        if self.ext == '.dot':
+            write_dot(self.cfg.graph, self.args.outfile)
+            l.info("CFG is exported to " + self.args.outfile)
+        else:
+            self._postprocess_cfg()
+            if self.fname:
+                endpoint = CFGVisEndpoint('cfg', self.cfg)
+                for addr in self.addrs:
+                    endpoint.serve(addr, fname=self.args.outfile)
+            else:
+                self._launch()
+                self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
+                self.add_endpoints()
 
     def run(self):
         try:
@@ -41,11 +62,12 @@ class CFGExplorerCLI(object):
         self.parser.add_argument('-s', '--start', nargs="*", dest='starts', help='start addresses')
         self.parser.add_argument('-P', '--port', dest='port', help='server port', type=int, default=5000)
         self.parser.add_argument('-p', '--pie', dest='pie', action='store_true', help='is position independent')
-        self.parser.add_argument('-l', '--launch',  dest='launch', action='store_true', help='launch browser')
+        self.parser.add_argument('-l', '--launch', dest='launch', action='store_true', help='launch browser')
+        self.parser.add_argument('-o', '--output', default='', dest='outfile', help="output file path")
 
     def _extend_parser(self):
         pass
-        
+
     def _create_cfg(self):
         main_opts = {}
         if self.args.pie:
@@ -56,9 +78,11 @@ class CFGExplorerCLI(object):
         self.addrs = [self.project.entry]
 
         if not self.args.starts:
-            self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=True, function_prologues=True, force_complete_scan=True, collect_data_references=False, resolve_indirect_jumps=True)
+            self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True,
+                                                     symbols=True, function_prologues=True, force_complete_scan=True,
+                                                     collect_data_references=False, resolve_indirect_jumps=True)
             if 'main' in self.project.kb.functions:
-                self.addrs = [ self.project.kb.functions['main'].addr ]
+                self.addrs = [self.project.kb.functions['main'].addr]
         else:
             self.addrs = []
 
@@ -66,10 +90,10 @@ class CFGExplorerCLI(object):
                 addr = None
 
                 try:
-                    addr = int(s,16)
+                    addr = int(s, 16)
                 except:
                     pass
-                    
+
                 if not addr:
                     sym = self.project.loader.main_bin.get_symbol(s)
                     if sym:
@@ -79,8 +103,11 @@ class CFGExplorerCLI(object):
                     self.addrs.append(addr)
                 else:
                     l.warning("Starting address unrecognized %s", s)
-                
-            self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=False, function_prologues=False, force_complete_scan=False, collect_data_references=False, start_at_entry=False, function_starts = self.addrs, resolve_indirect_jumps=True)
+
+            self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True,
+                                                     symbols=False, function_prologues=False, force_complete_scan=False,
+                                                     collect_data_references=False, start_at_entry=False,
+                                                     function_starts=self.addrs, resolve_indirect_jumps=True)
 
     def _postprocess_cfg(self):
         pass
@@ -94,9 +121,10 @@ class CFGExplorerCLI(object):
                 print(e)
                 pass
         else:
-            for addr in self.addrs:
-                l.info('http://localhost:%d/' % (self.args.port))
+            if not self.args.outfile:
+                for addr in self.addrs:
+                    l.info('http://localhost:%d/' % (self.args.port))
 
     def add_endpoints(self):
         self.app.add_vis_endpoint(CFGVisEndpoint('cfg', self.cfg))
-        self.app.add_vis_endpoint(FGraphVisEndpoint('function', self.project))
+        self.app.add_vis_endpoint(FGraphVisEndpoint('function', self.project, self.cfg))
