@@ -1,3 +1,4 @@
 bingraphvis
 flask
-
+networkx
+graphviz

@@ -75,7 +75,6 @@ class CFGExplorerCLI(object):
 
         self.project = angr.Project(self.args.binary, load_options={'auto_load_libs': False, 'main_opts': main_opts})
 
-        self.addrs = [self.project.entry]
 
         if not self.args.starts:
             self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True,
@@ -83,6 +82,8 @@ class CFGExplorerCLI(object):
                                                      collect_data_references=False, resolve_indirect_jumps=True)
             if 'main' in self.project.kb.functions:
                 self.addrs = [self.project.kb.functions['main'].addr]
+            else:
+                self.addrs = [self.project.entry]
         else:
             self.addrs = []
 
