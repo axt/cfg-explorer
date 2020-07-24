@@ -2,3 +2,4 @@ bingraphvis
 flask
 networkx
 graphviz
+angr
