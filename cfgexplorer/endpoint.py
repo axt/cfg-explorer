@@ -27,9 +27,14 @@ class VisEndpoint(object):
         raise NotImplementedError()
 
     def serve(self, addr_str, fname=''):
-        addr = int(addr_str, 16)
+        if isinstance(addr_str,str):
+            addr = int(addr_str, 16)
+        elif isinstance(addr_str,int):
+            addr = addr_str
+        else:
+            raise Exception('type error!')
 
-        outfile = fname if fname else os.path.join(tempfile.mktemp(dir="/dev/shm/", prefix="cfg-explorer-"), '.svg')
+        outfile = fname if fname else tempfile.mktemp(dir="/dev/shm/", prefix="cfg-explorer-")
 
         try:
             vis = self.create_vis(addr)
@@ -38,15 +43,17 @@ class VisEndpoint(object):
 
             vis.set_output(DotOutput(outfile, format="svg"))
             self.process_vis(vis, addr)
+            
+            final_output = os.path.join(outfile,'.svg')
 
             if not fname:
-                with open(outfile) as f:
+                with open(final_output) as f:
                     return Response(f.read(), mimetype='image/svg+xml')
             else:
-                l.info("CFG is exported to" + outfile)
+                l.info("CFG is exported to " + final_output)
         finally:
-            if outfile and not fname and os.path.exists(outfile + '.svg'):
-                os.remove(outfile + '.svg')
+            if final_output and not fname and os.path.exists(final_output):
+                os.remove(final_output)
 
 
 class CFGVisEndpoint(VisEndpoint):

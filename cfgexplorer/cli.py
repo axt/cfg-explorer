@@ -24,7 +24,7 @@ class CFGExplorerCLI(object):
 
         self.ext = 'svg'
         self.fname = ''
-        if not self.args.outfile:
+        if self.args.outfile:
             self.fname, self.ext = os.path.splitext(self.args.outfile)
             if self.ext != '.svg' and self.ext != '.dot':
                 l.error('Wrong output file foramt! Only support for .svg and .dot')
@@ -39,7 +39,7 @@ class CFGExplorerCLI(object):
             if self.fname:
                 endpoint = CFGVisEndpoint('cfg', self.cfg)
                 for addr in self.addrs:
-                    endpoint.serve(addr, fname=self.args.outfile)
+                    endpoint.serve(addr, fname=self.fname)
             else:
                 self._launch()
                 self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
@@ -47,7 +47,8 @@ class CFGExplorerCLI(object):
 
     def run(self):
         try:
-            self.app.run()
+            if not self.fname:
+                self.app.run()
         except KeyboardInterrupt:
             pass
 
