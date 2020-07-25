@@ -44,7 +44,7 @@ class VisEndpoint(object):
             vis.set_output(DotOutput(outfile, format="svg"))
             self.process_vis(vis, addr)
             
-            final_output = os.path.join(outfile,'.svg')
+            final_output = outfile+'.svg'
 
             if not fname:
                 with open(final_output) as f:

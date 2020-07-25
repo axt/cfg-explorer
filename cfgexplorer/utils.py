@@ -14,10 +14,10 @@ def cfg_explore(binary, starts=[], port=5050, pie=False, lanuch=False, output=''
     if pie:
         main_opts['custom_base_addr'] = 0x0
     proj = angr.Project(binary, auto_load_libs=False, main_opts=main_opts)
-    addrs = get_addrs(proj, starts)
 
     # create CFG
     if starts:
+        addrs = get_addrs(proj,starts)
         cfg = proj.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=False,
                                     function_prologues=False, force_complete_scan=False, collect_data_references=False,
                                     start_at_entry=False, function_starts=addrs, resolve_indirect_jumps=True)
@@ -25,6 +25,7 @@ def cfg_explore(binary, starts=[], port=5050, pie=False, lanuch=False, output=''
         cfg = proj.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=True,
                                     function_prologues=True, force_complete_scan=True, collect_data_references=False,
                                     resolve_indirect_jumps=True)
+        addrs = get_addrs(proj,starts)
 
     # lanuch a flask app
     if not output:
@@ -68,7 +69,7 @@ def get_addrs(proj, starts=[]):
         if 'main' in proj.kb.functions:
             addrs = [proj.kb.functions['main'].addr]
         else:
-            addrs = []
+            addrs = [proj.entry]
     return addrs
 
 

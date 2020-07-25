@@ -77,6 +77,7 @@ class CFGExplorerCLI(object):
         self.project = angr.Project(self.args.binary, load_options={'auto_load_libs': False, 'main_opts': main_opts})
 
 
+
         if not self.args.starts:
             self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True,
                                                      symbols=True, function_prologues=True, force_complete_scan=True,
