@@ -1,0 +1,2 @@
+recursive-include cfgexplorer/templates *
+recursive-include cfgexplorer/static *

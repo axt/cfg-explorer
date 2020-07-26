@@ -100,5 +100,6 @@ ENV/
 # mypy
 .mypy_cache/
 .idea/
+.dist/
 
 config.py
