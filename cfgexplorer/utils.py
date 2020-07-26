@@ -9,7 +9,12 @@ from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
 from networkx.drawing.nx_agraph import write_dot
 
 
-def cfg_explore(binary, starts=[], port=5050, pie=False, lanuch=False, output=''):
+def cfg_explore(binary,
+                starts=[],
+                port=5050,
+                pie=False,
+                lanuch=False,
+                output=''):
     main_opts = {}
     if pie:
         main_opts['custom_base_addr'] = 0x0
@@ -17,15 +22,27 @@ def cfg_explore(binary, starts=[], port=5050, pie=False, lanuch=False, output=''
 
     # create CFG
     if starts:
-        addrs = get_addrs(proj,starts)
-        cfg = proj.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=False,
-                                    function_prologues=False, force_complete_scan=False, collect_data_references=False,
-                                    start_at_entry=False, function_starts=addrs, resolve_indirect_jumps=True)
-    else:
-        cfg = proj.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=True,
-                                    function_prologues=True, force_complete_scan=True, collect_data_references=False,
+        addrs = get_addrs(proj, starts)
+        cfg = proj.analyses.CFGFast(fail_fast=False,
+                                    normalize=True,
+                                    show_progressbar=True,
+                                    symbols=False,
+                                    function_prologues=False,
+                                    force_complete_scan=False,
+                                    collect_data_references=False,
+                                    start_at_entry=False,
+                                    function_starts=addrs,
                                     resolve_indirect_jumps=True)
-        addrs = get_addrs(proj,starts)
+    else:
+        cfg = proj.analyses.CFGFast(fail_fast=False,
+                                    normalize=True,
+                                    show_progressbar=True,
+                                    symbols=True,
+                                    function_prologues=True,
+                                    force_complete_scan=True,
+                                    collect_data_references=False,
+                                    resolve_indirect_jumps=True)
+        addrs = get_addrs(proj, starts)
 
     # lanuch a flask app
     if not output:
@@ -38,13 +55,14 @@ def cfg_explore(binary, starts=[], port=5050, pie=False, lanuch=False, output=''
         except:
             pass
     else:
-        _, ext = os.path.splitext(output)
+        fname, ext = os.path.splitext(output)
         if ext == '.dot':
             write_dot(cfg.graph, output)
+            l.info("Export dotfile to " + output)
         elif ext == '.svg':
             endpoint = CFGVisEndpoint('cfg', cfg)
             for addr in addrs:
-                endpoint.serve(addr, output)
+                endpoint.serve(addr, fname)
         else:
             l.error('Wrong output file foramt! Only support for .svg and .dot')
             raise Exception('Invalid Input')
