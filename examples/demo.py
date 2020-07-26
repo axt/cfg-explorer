@@ -66,7 +66,7 @@ cfg_explore(binary='../../m2s-bench-spec2006/999.specrand/specrand_base.i386',ou
 
 # !dot test.dot -Tpng -o test.png
 
-# ![](output/test.png)
+# ![](test.png)
 
 # ### Export `.svg` files
 #
@@ -79,11 +79,21 @@ cfg_explore(binary='../../m2s-bench-spec2006/999.specrand/specrand_base.i386',ou
 from IPython.core.display import SVG
 display(SVG('test.svg'))
 
-# There are also many online tools availble that convert `.svg` to other format files. Besides, if you have installed `inkscape`, you can use:
+# There are also many online tools available that convert `.svg` to other format files. Besides, if you have installed `inkscape`, you can use:
 
 # !inkscape test.svg --export-area-drawing --without-gui --export-pdf=test.pdf
 
-# And now, you can open [test.pdf](test.pdf) directly to view the *control flow graph*. It is what $\TeX$ exactly do when asked to insert a `.svg` image into an article by `includegraphics{}`. It is to say that, if`inkscape`and $\TeX$ installed properly, you can simply use `nbconvert`
+# And now, you can open [test.pdf](test.pdf) directly to view the *control flow graph*. It is what $\TeX$ exactly do when asked to insert a `.svg` image into an article by `\includegraphics{}`. It is to say that, if `inkscape`and $\TeX$ installed properly, this notebook can be converted to a pretty pdf by `nbconvert`, which is built-in Jupyter notebook server. 
+
+# + [markdown] pycharm={"name": "#%% md\n"}
+# ### Traversal a large folder to generate all CFGs
+#
+# We still use `m2s-bench-spec2006` as an example.
+#
+# Assume that we need to analyze all binary files in this folder. Wrapping `cfg-explorer` as a function makes the task more flexible inside a Python script.
+#
+# First, get all potential binary files for analysis:
+# -
 
 from glob import glob
 progs = sorted(glob('../../m2s-bench-spec2006/*/*.i386'))
@@ -94,6 +104,12 @@ out_dir = './output'
 if not os.path.exists(out_dir):
     os.mkdir(out_dir)
 
+# + [markdown] pycharm={"name": "#%% md\n"}
+# Then, we can simply call `cfg_explore` function inside loops. Keep it alone, we just need to wait for generating all '.svg' files.
+#
+# **Note**: it might take a extremely long time. Be patient.
+# -
+
 for p in progs:
     name = p.split('/')[3]
     print('start analysis of:',name)
@@ -101,4 +117,7 @@ for p in progs:
     if not os.path.exists(output_file):
         cfg_explore(binary=p,output=output_file)
 
-
+# + [markdown] pycharm={"name": "#%% md\n"}
+# Now, you can view all outputs in `out_dir`.
+#
+#
