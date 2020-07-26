@@ -36,11 +36,15 @@
 # $ export PATH=$HOME/cfg-explorer:$PATH
 # ```
 #
-# Or import it in this notebook with absolute path as:
+# Or import it in this notebook by such an approach for that the target folder is actually the parent folder of this file:
 
+# +
 import os
 import sys
-sys.path.insert(0,'/home/wolixinyi/cfg-explorer/')
+from pathlib import Path
+
+sys.path.insert(0,str(Path().resolve().parent))
+# -
 
 # ##  Usages of `cfg_explore` Function
 
@@ -79,7 +83,7 @@ display(SVG('test.svg'))
 
 # !inkscape test.svg --export-area-drawing --without-gui --export-pdf=test.pdf
 
-# And now, you can open [test.pdf](test.pdf) directly to view the *control flow graph*.
+# And now, you can open [test.pdf](test.pdf) directly to view the *control flow graph*. It is what $\TeX$ exactly do when asked to insert a `.svg` image into an article by `includegraphics{}`. It is to say that, if`inkscape`and $\TeX$ installed properly, you can simply use `nbconvert`
 
 from glob import glob
 progs = sorted(glob('../../m2s-bench-spec2006/*/*.i386'))
