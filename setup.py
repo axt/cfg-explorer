@@ -16,17 +16,18 @@ setup(
     author_email='axt@load.hu',
     packages=packages,
     include_package_data=True,
-    install_requires=[
-        'argparse',
-        'angr',
-        'bingraphvis',
-        'flask'
-    ],
-    entry_points = {
-        'console_scripts': ['cfgexplorer=cfgexplorer:main'],
+    install_requires=['argparse', 'angr', 'bingraphvis', 'flask'],
+    entry_points={
+        'console_scripts': ['cfgexplorer=cfgexplorer.__main__:main'],
     },
     description='CFG explorer',
-    classifiers=['Programming Language :: Python :: 3.5','Programming Language :: Python :: 3.6','Programming Language :: Python :: 3.7',"Operating System :: POSIX :: Linux","License :: OSI Approved :: BSD License"],
+    classifiers=[
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        "Operating System :: POSIX :: Linux",
+        "License :: OSI Approved :: BSD License"
+    ],
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/axt/cfg-explorer',
