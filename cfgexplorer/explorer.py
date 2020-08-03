@@ -7,7 +7,7 @@ from flask import Flask, send_from_directory, render_template
 class CFGExplorer(object):
     def __init__(self, start_url, port=5000):
         
-        self._static_files_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../static/")
+        self._static_files_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./static/")
         self._app = Flask(__name__)
 
         self._app.add_url_rule('/<path:file_relative_path_to_root>', 'serve_page', self._serve_page, methods=['GET'])
