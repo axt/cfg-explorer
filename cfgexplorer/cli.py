@@ -9,15 +9,15 @@ import os
 from .explorer import CFGExplorer
 from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
 
-# from networkx.drawing.nx_agraph import write_dot
-
 support_type = ['canon', 'cmap', 'cmapx', 'cmapx_np', 'dia', 'dot', 'fig', 'gd', 'gd2', 'gif', 'hpgl', 'imap',
                 'imap_np', 'ismap', 'jpe', 'jpeg', 'jpg', 'mif', 'mp', 'pcl', 'pdf', 'pic', 'plain', 'plain-ext', 'png',
                 'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz', 'vrml', 'vtx', 'wbmp', 'xdot', 'xlib', 'raw']
 
 
 class CFGExplorerCLI(object):
-
+    """
+    By default, -l and -p will be invalid if you specify the -o argument, it will also give an output instead of launching a web app.
+    """
     def __init__(self):
         self.parser = None
         self.args = None
@@ -26,6 +26,7 @@ class CFGExplorerCLI(object):
 
         self._create_parser()
         self.args = self.parser.parse_args()
+
         self.ext = 'svg'
         self.fname = ''
         if self.args.outfile:
@@ -33,14 +34,11 @@ class CFGExplorerCLI(object):
             if self.ext:
                 self.ext = self.ext[1:]
             if self.ext not in support_type:
-                l.error('Wrong output file foramt! Only support for the following formats:' + str(support_type))
+                l.error('Wrong output file format! Only support for the following formats:' + str(support_type))
                 raise Exception('Invalid Input')
 
         self._create_cfg()
 
-        # if self.ext == '.dot':
-        #     write_dot(self.cfg.graph, self.args.outfile)
-        #     l.info("CFG is exported to " + self.args.outfile)
         self._postprocess_cfg()
         if self.fname:
             endpoint = CFGVisEndpoint('cfg', self.cfg)
@@ -52,6 +50,11 @@ class CFGExplorerCLI(object):
             self.add_endpoints()
 
     def run(self):
+        """
+        Build the app. If you specify the output file, the func will not be called
+        :return: None
+        :rtype: None
+        """
         try:
             if not self.fname:
                 self.app.run()
@@ -59,10 +62,20 @@ class CFGExplorerCLI(object):
             pass
 
     def _create_parser(self):
+        """
+        Create a parser to take arguments
+        :return:None
+        :rtype: None
+        """
         self._create_default_parser()
         self._extend_parser()
 
     def _create_default_parser(self):
+        """
+        Get all arguments in command lines
+        :return: None
+        :rtype: None
+        """
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument("-v", "--verbose", action="count", help="increase output verbosity")
         self.parser.add_argument('binary', metavar='binary', type=str, help='the binary to explore')
@@ -70,12 +83,20 @@ class CFGExplorerCLI(object):
         self.parser.add_argument('-P', '--port', dest='port', help='server port', type=int, default=5000)
         self.parser.add_argument('-p', '--pie', dest='pie', action='store_true', help='is position independent')
         self.parser.add_argument('-l', '--launch', dest='launch', action='store_true', help='launch browser')
-        self.parser.add_argument('-o', '--output', default='', dest='outfile', help="output file path")
+        self.parser.add_argument('-o', '--output', default='', dest='outfile', help="output file path, only support for "+ str(support_type))
 
     def _extend_parser(self):
         pass
 
     def _create_cfg(self):
+        """
+        Analyze the binary file and get
+        1. Get proper start addresses
+        2. Generate CFG by simple static analysis
+        3. Store the result in class
+        :return: None
+        :rtype: None
+        """
         main_opts = {}
         if self.args.pie:
             main_opts['custom_base_addr'] = 0x0
@@ -102,7 +123,7 @@ class CFGExplorerCLI(object):
                     pass
 
                 if not addr:
-                    sym = self.project.loader.main_bin.get_symbol(s)
+                    sym = self.project.loader.main_object.get_symbol(s)
                     if sym:
                         addr = sym.addr
 
@@ -120,6 +141,11 @@ class CFGExplorerCLI(object):
         pass
 
     def _launch(self):
+        """
+        Give a log info to reminder the app link. If you set --lanuch as True (using -l), it will automatically open the browser and jump to the link.
+        :return: None
+        :rtype: None
+        """
         if self.args.launch:
             try:
                 for addr in self.addrs:
@@ -128,10 +154,14 @@ class CFGExplorerCLI(object):
                 print(e)
                 pass
         else:
-            if not self.args.outfile:
-                for addr in self.addrs:
-                    l.info('http://localhost:%d/' % (self.args.port))
+            for addr in self.addrs:
+                l.info('http://localhost:%d/' % (self.args.port))
 
     def add_endpoints(self):
+        """
+        Create VisEndpoints for CFG and add it to CFGExplorer
+        :return: None
+        :rtype: None
+        """
         self.app.add_vis_endpoint(CFGVisEndpoint('cfg', self.cfg))
         self.app.add_vis_endpoint(FGraphVisEndpoint('function', self.project, self.cfg))

@@ -5,6 +5,9 @@ import os
 from flask import Flask, send_from_directory, render_template
 
 class CFGExplorer(object):
+    """
+    Interactive Flask app that shows the CFG
+    """
     def __init__(self, start_url, port=5000):
         
         self._static_files_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./static/")

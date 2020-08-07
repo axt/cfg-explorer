@@ -12,7 +12,7 @@ support_type = ['canon', 'cmap', 'cmapx', 'cmapx_np', 'dia', 'dot', 'fig', 'gd',
         'ps2', 'svg', 'svgz', 'vml', 'vmlz', 'vrml', 'vtx', 'wbmp', 'xdot', 'xlib', 'raw']
 
 
-def cfg_explore(binary, starts=[], port=5050, pie=False, launch=False, output=''):
+def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''):
     """
     :param binary: the path of binary file for analysis
     :type binary: str
@@ -24,7 +24,7 @@ def cfg_explore(binary, starts=[], port=5050, pie=False, launch=False, output=''
     :type pie: bool
     :param launch: Launch a browser to view CFG immediately
     :type launch: bool
-    :param output: the output file path. only support for '.dot' and '.svg' now. If leave it an empty string, no output will be generated and the interactive web app will start. Otherwise, no app will be launched and the CFGs will be exported to specified files.
+    :param output: the output file path. only support certain formats. If leave it an empty string, no output will be generated and the interactive web app will start. Otherwise, no app will be launched and the CFGs will be exported to specified files.
     :type output: str
     :return: None
     :rtype: None
@@ -64,11 +64,20 @@ def cfg_explore(binary, starts=[], port=5050, pie=False, launch=False, output=''
             for addr in addrs:
                 endpoint.serve(addr, fname, ext)
         else:
-            l.error('Wrong output file foramt! Only support for the following formats: ' + str(support_type))
+            l.error('Wrong output file format! Only support for the following formats: ' + str(support_type))
             raise Exception('Invalid Input')
 
 
 def get_addrs(proj, starts=[]):
+    """
+    Get all start addresses in the project for analysis
+    :param proj: the project to analyze
+    :type proj: angr.Project
+    :param starts: start address list
+    :type starts: list
+    :return: all possible start addresses
+    :rtype: list
+    """
     if starts:
         addrs = []
         for s in starts:
@@ -91,7 +100,15 @@ def get_addrs(proj, starts=[]):
     return addrs
 
 
-def lanuch_app(prompt=False, port=5050):
+def lanuch_app(prompt=False, port=5000):
+    """
+    :param prompt: whether lannuch a browser immediately
+    :type prompt: true
+    :param port: port to host the flask app
+    :type port: int
+    :return: None
+    :rtype: None
+    """
     if prompt:
         try:
             os.system('xdg-open http://localhost:%d/' % port)
