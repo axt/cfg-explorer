@@ -8,7 +8,10 @@ import os
 
 from .explorer import CFGExplorer
 from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
-from networkx.drawing.nx_agraph import write_dot
+
+# from networkx.drawing.nx_agraph import write_dot
+
+support_type = ['.svg', '.raw', '.pdf', '.png']
 
 
 class CFGExplorerCLI(object):
@@ -21,29 +24,28 @@ class CFGExplorerCLI(object):
 
         self._create_parser()
         self.args = self.parser.parse_args()
-
-        self.ext = 'svg'
+        self.ext = '.svg'
         self.fname = ''
         if self.args.outfile:
             self.fname, self.ext = os.path.splitext(self.args.outfile)
-            if self.ext != '.svg' and self.ext != '.dot':
-                l.error('Wrong output file foramt! Only support for .svg and .dot')
+            if self.ext not in support_type:
+                l.error('Wrong output file foramt! Only support for ' + ' '.join(support_type))
                 raise Exception('Invalid Input')
 
         self._create_cfg()
-        if self.ext == '.dot':
-            write_dot(self.cfg.graph, self.args.outfile)
-            l.info("CFG is exported to " + self.args.outfile)
+
+        # if self.ext == '.dot':
+        #     write_dot(self.cfg.graph, self.args.outfile)
+        #     l.info("CFG is exported to " + self.args.outfile)
+        self._postprocess_cfg()
+        if self.fname:
+            endpoint = CFGVisEndpoint('cfg', self.cfg)
+            for addr in self.addrs:
+                endpoint.serve(addr, fname=self.fname, format=self.ext[1:])
         else:
-            self._postprocess_cfg()
-            if self.fname:
-                endpoint = CFGVisEndpoint('cfg', self.cfg)
-                for addr in self.addrs:
-                    endpoint.serve(addr, fname=self.fname)
-            else:
-                self._launch()
-                self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
-                self.add_endpoints()
+            self._launch()
+            self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
+            self.add_endpoints()
 
     def run(self):
         try:
@@ -75,8 +77,6 @@ class CFGExplorerCLI(object):
             main_opts['custom_base_addr'] = 0x0
 
         self.project = angr.Project(self.args.binary, load_options={'auto_load_libs': False, 'main_opts': main_opts})
-
-
 
         if not self.args.starts:
             self.cfg = self.project.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True,

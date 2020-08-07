@@ -26,25 +26,26 @@ class VisEndpoint(object):
     def process_vis(self, vis, addr):
         raise NotImplementedError()
 
-    def serve(self, addr_str, fname=''):
-        if isinstance(addr_str,str):
+    def serve(self, addr_str, fname='', format='svg'):
+        if isinstance(addr_str, str):
             addr = int(addr_str, 16)
-        elif isinstance(addr_str,int):
+        elif isinstance(addr_str, int):
             addr = addr_str
         else:
             raise Exception('type error!')
 
         outfile = fname if fname else tempfile.mktemp(dir="/dev/shm/", prefix="cfg-explorer-")
+        final_output = ''
 
         try:
             vis = self.create_vis(addr)
             self.annotate_vis(vis, addr)
             self.xref_vis(vis, addr)
 
-            vis.set_output(DotOutput(outfile, format="svg"))
+            vis.set_output(DotOutput(outfile, format=format))
             self.process_vis(vis, addr)
-            
-            final_output = outfile+'.svg'
+
+            final_output = outfile + '.' + format
 
             if not fname:
                 with open(final_output) as f:
