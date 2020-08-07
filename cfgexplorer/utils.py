@@ -6,7 +6,8 @@ l = logging.getLogger('axt.cfgexplorer')
 
 from .explorer import CFGExplorer
 from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
-from networkx.drawing.nx_agraph import write_dot
+
+support_type = ['.svg', '.raw', '.pdf', '.png']
 
 
 def cfg_explore(binary, starts=[], port=5050, pie=False, launch=False, output=''):
@@ -55,15 +56,12 @@ def cfg_explore(binary, starts=[], port=5050, pie=False, launch=False, output=''
             pass
     else:
         fname, ext = os.path.splitext(output)
-        if ext == '.dot':
-            write_dot(cfg.graph, output)
-            l.info("Export dotfile to " + output)
-        elif ext == '.svg':
+        if ext in support_type:
             endpoint = CFGVisEndpoint('cfg', cfg)
             for addr in addrs:
-                endpoint.serve(addr, fname)
+                endpoint.serve(addr, fname, ext[1:])
         else:
-            l.error('Wrong output file foramt! Only support for .svg and .dot')
+            l.error('Wrong output file foramt! Only support for' + ', '.join(support_type) + ' formats.')
             raise Exception('Invalid Input')
 
 

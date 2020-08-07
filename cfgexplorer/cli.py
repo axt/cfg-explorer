@@ -29,7 +29,7 @@ class CFGExplorerCLI(object):
         if self.args.outfile:
             self.fname, self.ext = os.path.splitext(self.args.outfile)
             if self.ext not in support_type:
-                l.error('Wrong output file foramt! Only support for ' + ' '.join(support_type))
+                l.error('Wrong output file foramt! Only support for ' + ', '.join(support_type) + ' formats.')
                 raise Exception('Invalid Input')
 
         self._create_cfg()
