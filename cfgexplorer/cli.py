@@ -11,7 +11,9 @@ from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
 
 # from networkx.drawing.nx_agraph import write_dot
 
-support_type = ['.svg', '.raw', '.pdf', '.png']
+support_type = ['canon', 'cmap', 'cmapx', 'cmapx_np', 'dia', 'dot', 'fig', 'gd', 'gd2', 'gif', 'hpgl', 'imap',
+                'imap_np', 'ismap', 'jpe', 'jpeg', 'jpg', 'mif', 'mp', 'pcl', 'pdf', 'pic', 'plain', 'plain-ext', 'png',
+                'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz', 'vrml', 'vtx', 'wbmp', 'xdot', 'xlib', 'raw']
 
 
 class CFGExplorerCLI(object):
@@ -24,12 +26,14 @@ class CFGExplorerCLI(object):
 
         self._create_parser()
         self.args = self.parser.parse_args()
-        self.ext = '.svg'
+        self.ext = 'svg'
         self.fname = ''
         if self.args.outfile:
             self.fname, self.ext = os.path.splitext(self.args.outfile)
+            if self.ext:
+                self.ext = self.ext[1:]
             if self.ext not in support_type:
-                l.error('Wrong output file foramt! Only support for ' + ', '.join(support_type) + ' formats.')
+                l.error('Wrong output file foramt! Only support for the following formats:' + str(support_type))
                 raise Exception('Invalid Input')
 
         self._create_cfg()
@@ -41,7 +45,7 @@ class CFGExplorerCLI(object):
         if self.fname:
             endpoint = CFGVisEndpoint('cfg', self.cfg)
             for addr in self.addrs:
-                endpoint.serve(addr, fname=self.fname, format=self.ext[1:])
+                endpoint.serve(addr, fname=self.fname, format=self.ext)
         else:
             self._launch()
             self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)

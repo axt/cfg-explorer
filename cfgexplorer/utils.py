@@ -7,7 +7,9 @@ l = logging.getLogger('axt.cfgexplorer')
 from .explorer import CFGExplorer
 from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
 
-support_type = ['.svg', '.raw', '.pdf', '.png']
+support_type = ['canon', 'cmap', 'cmapx', 'cmapx_np', 'dia', 'dot', 'fig', 'gd', 'gd2', 'gif', 'hpgl', 'imap',
+        'imap_np', 'ismap', 'jpe', 'jpeg', 'jpg', 'mif', 'mp', 'pcl', 'pdf', 'pic', 'plain', 'plain-ext', 'png', 'ps',
+        'ps2', 'svg', 'svgz', 'vml', 'vmlz', 'vrml', 'vtx', 'wbmp', 'xdot', 'xlib', 'raw']
 
 
 def cfg_explore(binary, starts=[], port=5050, pie=False, launch=False, output=''):
@@ -56,12 +58,13 @@ def cfg_explore(binary, starts=[], port=5050, pie=False, launch=False, output=''
             pass
     else:
         fname, ext = os.path.splitext(output)
+        ext = ext[1:]
         if ext in support_type:
             endpoint = CFGVisEndpoint('cfg', cfg)
             for addr in addrs:
-                endpoint.serve(addr, fname, ext[1:])
+                endpoint.serve(addr, fname, ext)
         else:
-            l.error('Wrong output file foramt! Only support for' + ', '.join(support_type) + ' formats.')
+            l.error('Wrong output file foramt! Only support for the following formats: ' + str(support_type))
             raise Exception('Invalid Input')
 
 
