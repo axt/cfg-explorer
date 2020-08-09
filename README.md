@@ -125,6 +125,24 @@ cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output='')
 
 Detailed usages of this function is available in [examples/demo.ipynb](./examples/demo.ipynb).
 
+## Annotation Style
+
+Edges:
+
+
+Edge class | Color | Style
+---------|----------|---------
+Conditional True | Green | 
+Conditional False | Red | 
+Unconditional | Blue|
+Next | Blue | Dashed
+Call | Black | 
+Return | Gray | 
+Fake Return | Gray | Dotted
+Unknown | Orange | 
+
+
+
 ## Limitations
 * works on Linux only
 * at the moment, the result is simply an SVG file, i plan to add a small frontend around it
