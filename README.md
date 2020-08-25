@@ -90,7 +90,7 @@ For example:
 $ cfgexplorer /your/binary -l
 ```
 
-The command above will build the CFG, spawn a web server and open it in your browser.
+The command above will build the CFG, spawn a web server, and open it in your browser.
 
 ### Module
 
@@ -102,7 +102,7 @@ from cfgexplorer import cfg_explore
 cfg_explore(binary=r'/your/binary', launch=True)
 ```
 
-Will do what the `cfgexplorer` does in the previous example. If you want to shut down the app, you need to interrupt your Python interpreter as well. So the function is more often used by specifying `output` to generate output files in a Python program like:
+The codes will do what the `cfgexplorer` does in the previous example. If you want to shut down the app, you need to interrupt your Python interpreter as well. So the function is more often used by specifying `output` to generate output files in a Python program like:
 
 ```py
 cfg_explore(binary=r'/your/binary', output='./cfg_output.svg')
@@ -110,20 +110,20 @@ cfg_explore(binary=r'/your/binary', output='./cfg_output.svg')
 
 The code above exports CFG as `svg` format to file path `./cfg_output.svg`
 
-The function is defined as following:
+The function is defined as follow:
 
 ```py
 cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output='')
 ```
 
-- binary(*str*): the path of binary file to analysis
+- binary(*str*): the path of the binary file to analysis
 - starts(*list*): the start points (address) in CFGs, if none, the CFG will start with main func entry address
 - port(*int*): server port to host the web app. make sure the port is idle now.
 - pie(*bool*): whether the analysis position-independent
 - launch(*bool*): Whether launch a browser to view CFG immediately
 - output(*str*): the output file path. only support certain formats. If you leave it an empty string, no output will be generated and the interactive web app will start. Otherwise, no app will be launched and the CFGs will be exported to specified files.
 
-Detailed usages of this function is available in [examples/demo.ipynb](./examples/demo.ipynb).
+Detailed usages of this function are available in [examples/demo.ipynb](./examples/demo.ipynb).
 
 ## Annotation Style
 
