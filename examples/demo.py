@@ -30,6 +30,14 @@
 #
 # ## Import Libraries
 #
+# If you have not installed `cfg_exploerer` module, you can install it with
+#
+# ```
+# $ pip install cfg_explorer
+# ```
+#
+# Of course, If you just want to try it without installation, it's Okay:
+#
 # First, to import `cfg_explore` in this subdirectory, you should include your `cfg-explorer` path into your `PATH` environment variable. You can do this by (suppose the whole `cfg-explorer` directory is located in `$HOME/cfg-explorer`):
 #
 # ```
@@ -58,19 +66,11 @@ cfg_explore(binary='../../m2s-bench-spec2006/999.specrand/specrand_base.i386')
 
 # Whenever you want to shut down the app, just interrupt the function. For example, in this notebook, click on <kbd>interrupt the kernel</kbd>buttom on the toolbar.
 
-# ### Export raw `.dot` files
-
-cfg_explore(binary='../../m2s-bench-spec2006/999.specrand/specrand_base.i386',output='test.dot')
-
-# `.dot` file can be converted to image format, for example, if you have installed `graphviz` in your machine, try this command:
-
-# !dot test.dot -Tpng -o test.png
-
-# ![](test.png)
-
-# ### Export `.svg` files
+# ### Generate multiple formats of outputs
 #
-# You can also specify the `output` argument with `.svg` suffix, and you will get the same graph as what you see in the web app without `output` [before](#Lanuch-an-interactive-web-app)
+# Instead of launching a web app, you can also let `cfg_explore` generate output files by specifying `output` argument.
+#
+# For instance, we can get the `svg` format CFG of `specrand_base.i386'` using:
 
 cfg_explore(binary='../../m2s-bench-spec2006/999.specrand/specrand_base.i386',output='./test.svg')
 
@@ -79,11 +79,25 @@ cfg_explore(binary='../../m2s-bench-spec2006/999.specrand/specrand_base.i386',ou
 from IPython.core.display import SVG
 display(SVG('test.svg'))
 
-# There are also many online tools available that convert `.svg` to other format files. Besides, if you have installed `inkscape`, you can use:
+# There are also a bunch of formats that `cfg_explore` can handle. The only thing you need to do is to specify proper suffix (i.e. extension name) in path which is passed as`output` argument.
+#
+# Current supported formats are listed as below:
 
-# !inkscape test.svg --export-area-drawing --without-gui --export-pdf=test.pdf
+formats = [
+    'canon', 'cmap', 'cmapx', 'cmapx_np', 'dot', 'fig', 'gd', 'gd2', 'gif',
+    'imap', 'imap_np', 'ismap', 'jpe', 'jpeg', 'jpg', 'mp', 'pdf', 'plain',
+    'plain-ext', 'png', 'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz', 'vrml',
+    'wbmp', 'xdot', 'raw'
+]
 
-# And now, you can open [test.pdf](test.pdf) directly to view the *control flow graph*. It is what $\TeX$ exactly do when asked to insert a `.svg` image into an article by `\includegraphics{}`. It is to say that, if `inkscape`and $\TeX$ installed properly, this notebook can be converted to a pretty pdf by `nbconvert`, which is built-in Jupyter notebook server. 
+# Try all formats by:
+
+for format in formats:
+    cfg_explore(binary='../../m2s-bench-spec2006/999.specrand/specrand_base.i386',output='./test.'+format)
+
+# View the output `png`:
+#
+# ![](test.png)
 
 # + [markdown] pycharm={"name": "#%% md\n"}
 # ### Traversal a large folder to generate all CFGs
