@@ -1,5 +1,12 @@
 # cfg-explorer
 
+[![license](https://img.shields.io/github/license/axt/cfg-explorer?style=flat-square)](https://github.com/axt/cfg-explorer)
+![platform](https://img.shields.io/badge/platform-Linux-yellowgreen?style=flat-square)
+[![pyversion](https://img.shields.io/pypi/pyversions/cfg-explorer?style=flat-square)](https://pypi.org/project/cfg-explorer/)
+[![version](https://img.shields.io/pypi/v/cfg-explorer?style=flat-square)](https://pypi.org/project/cfg-explorer/)
+[![download](https://img.shields.io/pypi/dm/cfg-explorer?style=flat-square)](https://pypi.org/project/cfg-explorer/)
+
+
 CFG explorer is a simple utility which can be used to explore control flow graphs of binary programs.
 
 It uses [angr](https://github.com/angr/angr) binary analysis framework, for CFG recovery, and renders the CFG to SVGs, with the help of [bingraphvis](http://github.com/axt/bingraphvis/). 
@@ -48,7 +55,7 @@ This project is in its very early stage!
 ## Install
 
 ```
-$ pip install -i https://test.pypi.org/simple/ cfg-explorer
+$ pip install cfg-explorer
 ```
 
 ## Usage
