@@ -47,7 +47,7 @@ class CFGExplorerCLI(object):
         if self.fname:
             endpoint = CFGVisEndpoint('cfg', self.cfg)
             for addr,func in zip(self.addrs,self.func):
-                endpoint.serve(addr, fname=self.fname+func, format=self.ext)
+                endpoint.serve(addr, fname=self.fname+'-'+func, format=self.ext)
         else:
             self._launch()
             self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
@@ -130,7 +130,7 @@ class CFGExplorerCLI(object):
                 if not addr:
                     sym = self.project.loader.main_object.get_symbol(s)
                     if sym:
-                        addr = sym.addr
+                        addr = sym.rebased_addr
 
                 if addr:
                     self.addrs.append(addr)
