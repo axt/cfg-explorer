@@ -15,7 +15,7 @@ support_type = [
 ]
 
 
-def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''):
+def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output='',full_call_graph=False):
     """
     :param binary: the path of binary file for analysis
     :type binary: str
@@ -88,7 +88,7 @@ def get_addrs(proj, starts=[]):
                 addr = int(s, 16)
                 addrs.append(addr)
             except:
-                sym = proj.loader.main_bin.get_symbol(s)
+                sym = proj.loader.main_object.get_symbol(s)
                 if sym:
                     addr = sym.addr
                     if addr:

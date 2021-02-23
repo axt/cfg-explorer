@@ -26,6 +26,7 @@ class CFGExplorerCLI(object):
         self.args = None
         self.project = None
         self.cfg = None
+        self.func = []
 
         self._create_parser()
         self.args = self.parser.parse_args()
@@ -45,8 +46,8 @@ class CFGExplorerCLI(object):
         self._postprocess_cfg()
         if self.fname:
             endpoint = CFGVisEndpoint('cfg', self.cfg)
-            for addr in self.addrs:
-                endpoint.serve(addr, fname=self.fname, format=self.ext)
+            for addr,func in zip(self.addrs,self.func):
+                endpoint.serve(addr, fname=self.fname+func, format=self.ext)
         else:
             self._launch()
             self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
@@ -114,6 +115,7 @@ class CFGExplorerCLI(object):
                 self.addrs = [self.project.kb.functions['main'].addr]
             else:
                 self.addrs = [self.project.entry]
+            self.func = ['']
         else:
             self.addrs = []
 
@@ -132,6 +134,7 @@ class CFGExplorerCLI(object):
 
                 if addr:
                     self.addrs.append(addr)
+                    self.func.append(s)
                 else:
                     l.warning("Starting address unrecognized %s", s)
 
