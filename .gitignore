@@ -103,3 +103,7 @@ ENV/
 .dist/
 
 config.py
+
+*.svg
+.vscode/*
+examples/test.*

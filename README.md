@@ -46,6 +46,7 @@ Besides, now it can also export multiple formats of static CFG files to your loc
 - .xdot
 - **.raw**
 
+CFGs starting from multiple start addresses or for multiple functions can also be automatically exported to multiple files at once with different suffixes in their filenames.
 
 
 ## Note

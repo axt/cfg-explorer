@@ -65,7 +65,7 @@ def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''
                 if func:
                     endpoint.serve(addr, fname + '-' + func, ext)
                 else:
-                    endpoint.serve(addr, ext)
+                    endpoint.serve(addr,fname,ext)
         else:
             l.error('Wrong output file format! Only support for the following formats: ' + str(support_type))
             raise Exception('Invalid Input')
