@@ -9,23 +9,22 @@ import os
 from .explorer import CFGExplorer
 from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
 
-support_type = [
-    'canon', 'cmap', 'cmapx', 'cmapx_np', 'dot', 'fig', 'gd', 'gd2', 'gif',
-    'imap', 'imap_np', 'ismap', 'jpe', 'jpeg', 'jpg', 'mp', 'pdf', 'plain',
-    'plain-ext', 'png', 'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz', 'vrml',
-    'wbmp', 'xdot', 'raw'
-]
+support_type = ['canon', 'cmap', 'cmapx', 'cmapx_np', 'dot', 'fig', 'gd', 'gd2', 'gif', 'imap', 'imap_np', 'ismap',
+        'jpe', 'jpeg', 'jpg', 'mp', 'pdf', 'plain', 'plain-ext', 'png', 'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz',
+        'vrml', 'wbmp', 'xdot', 'raw']
 
 
 class CFGExplorerCLI(object):
     """
     By default, -l and -p will be invalid if you specify the -o argument, it will also give an output instead of launching a web app.
     """
+
     def __init__(self):
         self.parser = None
         self.args = None
         self.project = None
         self.cfg = None
+        self.func = []
 
         self._create_parser()
         self.args = self.parser.parse_args()
@@ -45,8 +44,8 @@ class CFGExplorerCLI(object):
         self._postprocess_cfg()
         if self.fname:
             endpoint = CFGVisEndpoint('cfg', self.cfg)
-            for addr in self.addrs:
-                endpoint.serve(addr, fname=self.fname, format=self.ext)
+            for addr, func in zip(self.addrs, self.func):
+                endpoint.serve(addr, fname=func, format=self.ext)
         else:
             self._launch()
             self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
@@ -86,7 +85,8 @@ class CFGExplorerCLI(object):
         self.parser.add_argument('-P', '--port', dest='port', help='server port', type=int, default=5000)
         self.parser.add_argument('-p', '--pie', dest='pie', action='store_true', help='is position independent')
         self.parser.add_argument('-l', '--launch', dest='launch', action='store_true', help='launch browser')
-        self.parser.add_argument('-o', '--output', default='', dest='outfile', help="output file path, only support for "+ str(support_type))
+        self.parser.add_argument('-o', '--output', default='', dest='outfile',
+                                 help="output file path, only support for " + str(support_type))
 
     def _extend_parser(self):
         pass
@@ -114,6 +114,7 @@ class CFGExplorerCLI(object):
                 self.addrs = [self.project.kb.functions['main'].addr]
             else:
                 self.addrs = [self.project.entry]
+            self.func = [self.fname]
         else:
             self.addrs = []
 
@@ -128,10 +129,11 @@ class CFGExplorerCLI(object):
                 if not addr:
                     sym = self.project.loader.main_object.get_symbol(s)
                     if sym:
-                        addr = sym.addr
+                        addr = sym.rebased_addr
 
                 if addr:
                     self.addrs.append(addr)
+                    self.func.append(self.fname + '-' + s)
                 else:
                     l.warning("Starting address unrecognized %s", s)
 
@@ -151,14 +153,12 @@ class CFGExplorerCLI(object):
         """
         if self.args.launch:
             try:
-                for addr in self.addrs:
-                    os.system('xdg-open http://localhost:%d/' % (self.args.port))
+                os.system('xdg-open http://localhost:%d/' % (self.args.port))
             except Exception as e:
-                print(e)
+                l.error(e)
                 pass
         else:
-            for addr in self.addrs:
-                l.info('http://localhost:%d/' % (self.args.port))
+            l.info('http://localhost:%d/' % (self.args.port))
 
     def add_endpoints(self):
         """

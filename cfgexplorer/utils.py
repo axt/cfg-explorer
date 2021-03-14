@@ -7,15 +7,12 @@ l = logging.getLogger('axt.cfgexplorer')
 from .explorer import CFGExplorer
 from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
 
-support_type = [
-    'canon', 'cmap', 'cmapx', 'cmapx_np', 'dot', 'fig', 'gd', 'gd2', 'gif',
-    'imap', 'imap_np', 'ismap', 'jpe', 'jpeg', 'jpg', 'mp', 'pdf', 'plain',
-    'plain-ext', 'png', 'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz', 'vrml',
-    'wbmp', 'xdot', 'raw'
-]
+support_type = ['canon', 'cmap', 'cmapx', 'cmapx_np', 'dot', 'fig', 'gd', 'gd2', 'gif', 'imap', 'imap_np', 'ismap',
+        'jpe', 'jpeg', 'jpg', 'mp', 'pdf', 'plain', 'plain-ext', 'png', 'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz',
+        'vrml', 'wbmp', 'xdot', 'raw']
 
 
-def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''):
+def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output='', full_call_graph=False):
     """
     :param binary: the path of binary file for analysis
     :type binary: str
@@ -39,7 +36,7 @@ def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''
 
     # create CFG
     if starts:
-        addrs = get_addrs(proj, starts)
+        addrs, funcs = get_addrs(proj, starts)
         cfg = proj.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=False,
                                     function_prologues=False, force_complete_scan=False, collect_data_references=False,
                                     start_at_entry=False, function_starts=addrs, resolve_indirect_jumps=True)
@@ -47,7 +44,7 @@ def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''
         cfg = proj.analyses.CFGFast(fail_fast=False, normalize=True, show_progressbar=True, symbols=True,
                                     function_prologues=True, force_complete_scan=True, collect_data_references=False,
                                     resolve_indirect_jumps=True)
-        addrs = get_addrs(proj, starts)
+        addrs, funcs = get_addrs(proj, starts)
 
     # lanuch a flask app
     if not output:
@@ -64,8 +61,11 @@ def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''
         ext = ext[1:]
         if ext in support_type:
             endpoint = CFGVisEndpoint('cfg', cfg)
-            for addr in addrs:
-                endpoint.serve(addr, fname, ext)
+            for addr, func in zip(addrs, funcs):
+                if func:
+                    endpoint.serve(addr, fname + '-' + func, ext)
+                else:
+                    endpoint.serve(addr,fname,ext)
         else:
             l.error('Wrong output file format! Only support for the following formats: ' + str(support_type))
             raise Exception('Invalid Input')
@@ -81,6 +81,7 @@ def get_addrs(proj, starts=[]):
     :return: all possible start addresses
     :rtype: list
     """
+    funcs = []
     if starts:
         addrs = []
         for s in starts:
@@ -88,11 +89,12 @@ def get_addrs(proj, starts=[]):
                 addr = int(s, 16)
                 addrs.append(addr)
             except:
-                sym = proj.loader.main_bin.get_symbol(s)
+                sym = proj.loader.main_object.get_symbol(s)
                 if sym:
-                    addr = sym.addr
+                    addr = sym.rebased_addr
                     if addr:
                         addrs.append(addr)
+                        funcs.append(s)
                 else:
                     l.warning("Starting address unrecognized %s", s)
     else:
@@ -100,7 +102,9 @@ def get_addrs(proj, starts=[]):
             addrs = [proj.kb.functions['main'].addr]
         else:
             addrs = [proj.entry]
-    return addrs
+        funcs.append('')
+
+    return addrs, funcs
 
 
 def lanuch_app(prompt=False, port=5000):
