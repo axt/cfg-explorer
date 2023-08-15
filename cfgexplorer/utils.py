@@ -69,7 +69,50 @@ def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''
         else:
             l.error('Wrong output file format! Only support for the following formats: ' + str(support_type))
             raise Exception('Invalid Input')
+        
+def cfg_explore_get_cfg(cfg, proj, starts=[], port=5000, launch=False, output=''):
+    """
+    :param cfg
+    :type cfg: cfg
+    :param proj
+    :type proj: bool
+    :param starts: the start points (address) in CFGs, if none, the CFG will start with main func entry address
+    :type starts: list
+    :param port: server port to host the web app. make sure the port is idle now.
+    :type port: int
+    :param launch: Launch a browser to view CFG immediately
+    :type launch: bool
+    :param output: the output file path. only support certain formats. If leave it an empty string, no output will be generated and the interactive web app will start. Otherwise, no app will be launched and the CFGs will be exported to specified files.
+    :type output: str
+    :return: None
+    :rtype: None
+    """
 
+    addrs, funcs = get_addrs(proj, starts)
+
+    # lanuch a flask app
+    if not output:
+        lanuch_app(launch, port)
+        app = CFGExplorer(start_url='/api/cfg/%#08x' % addrs[0], port=port)
+        app.add_vis_endpoint(CFGVisEndpoint('cfg', cfg))
+        app.add_vis_endpoint(FGraphVisEndpoint('function', proj, cfg))
+        try:
+            app.run()
+        except:
+            pass
+    else:
+        fname, ext = os.path.splitext(output)
+        ext = ext[1:]
+        if ext in support_type:
+            endpoint = CFGVisEndpoint('cfg', cfg)
+            for addr, func in zip(addrs, funcs):
+                if func:
+                    endpoint.serve(addr, fname + '-' + func, ext)
+                else:
+                    endpoint.serve(addr,fname,ext)
+        else:
+            l.error('Wrong output file format! Only support for the following formats: ' + str(support_type))
+            raise Exception('Invalid Input')
 
 def get_addrs(proj, starts=[]):
     """
