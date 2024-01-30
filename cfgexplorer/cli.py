@@ -4,6 +4,7 @@ l = logging.getLogger('axt.cfgexplorer')
 
 import argparse
 import angr
+from angr_platforms.risc_v import *
 import os
 
 from .explorer import CFGExplorer
