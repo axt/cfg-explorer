@@ -3,3 +3,4 @@ flask
 networkx
 graphviz
 angr
+git+https://github.com/angr/angr-platforms.git
