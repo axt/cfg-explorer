@@ -8,7 +8,7 @@ from angr_platforms.risc_v import *
 import os
 
 from .explorer import CFGExplorer
-from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
+from .endpoint import CFGVisEndpoint, CFGExpandedVisEndpoint, FGraphVisEndpoint
 
 support_type = ['canon', 'cmap', 'cmapx', 'cmapx_np', 'dot', 'fig', 'gd', 'gd2', 'gif', 'imap', 'imap_np', 'ismap',
         'jpe', 'jpeg', 'jpg', 'mp', 'pdf', 'plain', 'plain-ext', 'png', 'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz',
@@ -169,4 +169,5 @@ class CFGExplorerCLI(object):
         :rtype: None
         """
         self.app.add_vis_endpoint(CFGVisEndpoint('cfg', self.cfg))
+        self.app.add_vis_endpoint(CFGExpandedVisEndpoint('cfgexp', self.cfg))
         self.app.add_vis_endpoint(FGraphVisEndpoint('function', self.project, self.cfg))

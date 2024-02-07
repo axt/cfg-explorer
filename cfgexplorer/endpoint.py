@@ -72,6 +72,35 @@ class CFGVisEndpoint(VisEndpoint):
     def process_vis(self, vis, addr):
         vis.process(self.cfg.graph, filter=lambda node: node.obj.function_address == addr)
 
+class CFGExpandedVisEndpoint(VisEndpoint):
+    def __init__(self, name, cfg):
+        super(CFGExpandedVisEndpoint, self).__init__(name)
+        self.cfg = cfg
+
+    def create_vis(self, addr):
+        vis = AngrVisFactory().default_cfg_pipeline(self.cfg, asminst=True)
+        return vis
+
+    def xref_vis(self, vis, addr):
+        vis.add_node_annotator(XRefCFGCallsites(self.cfg.project, self.name))
+
+    def process_vis(self, vis, addr):
+        all_func_addr = set()
+        all_func_addr.add(addr)
+        
+        # collect all the called functions starting from addr
+        while True:
+            changed = False
+            for (s,t,k) in self.cfg.kb.callgraph.edges:
+                if s in all_func_addr and t not in all_func_addr:
+                    all_func_addr.add(t)
+                    changed = True
+            if not changed:
+                break
+
+        vis.process(self.cfg.graph, filter=lambda node: node.obj.function_address in all_func_addr)
+
+
 
 class FGraphVisEndpoint(VisEndpoint):
     def __init__(self, name, project, kb=None):

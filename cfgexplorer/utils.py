@@ -5,7 +5,7 @@ import logging
 l = logging.getLogger('axt.cfgexplorer')
 
 from .explorer import CFGExplorer
-from .endpoint import CFGVisEndpoint, FGraphVisEndpoint
+from .endpoint import CFGVisEndpoint, CFGExpandedVisEndpoint, FGraphVisEndpoint
 
 support_type = ['canon', 'cmap', 'cmapx', 'cmapx_np', 'dot', 'fig', 'gd', 'gd2', 'gif', 'imap', 'imap_np', 'ismap',
         'jpe', 'jpeg', 'jpg', 'mp', 'pdf', 'plain', 'plain-ext', 'png', 'ps', 'ps2', 'svg', 'svgz', 'vml', 'vmlz',
@@ -51,6 +51,7 @@ def cfg_explore(binary, starts=[], port=5000, pie=False, launch=False, output=''
         lanuch_app(launch, port)
         app = CFGExplorer(start_url='/api/cfg/%#08x' % addrs[0], port=port)
         app.add_vis_endpoint(CFGVisEndpoint('cfg', cfg))
+        app.add_vis_endpoint(CFGExpandedVisEndpoint('cfgexp', proj, cfg))
         app.add_vis_endpoint(FGraphVisEndpoint('function', proj, cfg))
         try:
             app.run()
@@ -95,6 +96,7 @@ def cfg_explore_get_cfg(cfg, proj, starts=[], port=5000, launch=False, output=''
         lanuch_app(launch, port)
         app = CFGExplorer(start_url='/api/cfg/%#08x' % addrs[0], port=port)
         app.add_vis_endpoint(CFGVisEndpoint('cfg', cfg))
+        app.add_vis_endpoint(CFGExpandedVisEndpoint('cfgexp', proj, cfg))
         app.add_vis_endpoint(FGraphVisEndpoint('function', proj, cfg))
         try:
             app.run()
