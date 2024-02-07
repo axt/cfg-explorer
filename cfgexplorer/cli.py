@@ -48,8 +48,9 @@ class CFGExplorerCLI(object):
             for addr, func in zip(self.addrs, self.func):
                 endpoint.serve(addr, fname=func, format=self.ext)
         else:
+            self.start_url='/api/cfg/%#08x' % self.addrs[0]
             self._launch()
-            self.app = CFGExplorer(start_url='/api/cfg/%#08x' % self.addrs[0], port=self.args.port)
+            self.app = CFGExplorer(start_url=self.start_url, port=self.args.port)
             self.add_endpoints()
 
     def run(self):
@@ -154,12 +155,12 @@ class CFGExplorerCLI(object):
         """
         if self.args.launch:
             try:
-                os.system('xdg-open http://localhost:%d/' % (self.args.port))
+                os.system('xdg-open http://localhost:%d%s' % (self.args.port, self.start_url))
             except Exception as e:
                 l.error(e)
                 pass
         else:
-            l.info('http://localhost:%d/' % (self.args.port))
+            l.info('http://localhost:%d%s' % (self.args.port, self.start_url))
 
     def add_endpoints(self):
         """
