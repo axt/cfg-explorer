@@ -48,6 +48,34 @@ Besides, now it can also export multiple formats of static CFG files to your loc
 
 CFGs starting from multiple start addresses or for multiple functions can also be automatically exported to multiple files at once with different suffixes in their filenames.
 
+## Quick Start: Use Docker Image
+
+1. build the docker image
+
+```bash
+docker build -t cfg-explorer .
+```
+
+2. run the docker container, mount the directory containing the binary to be analyzed to `/data` in the container
+
+
+For example, use [`examples/specrand_base.i386`](./examples/specrand_base.i386) as the binary and output the CFG to `./output/cfg.pdf`:
+
+```bash
+docker run -v $(pwd)/examples/specrand_base.i386:/data/binary  \
+    -v $(pwd)/output:/output cfg-explorer /data/binary -l -o /output/cfg.pdf
+```
+
+Or let it start a web server and open the browser to view the CFG:
+
+
+```bash
+docker run -p 8000:5000 -v $(pwd)/examples/specrand_base.i386:/data/binary  \
+ cfg-explorer /data/binary
+```
+
+You can view the CFG in your browser by visiting `http://localhost:8000/api/cfg/0x[entry_address]` according to the output of the command.
+
 
 ## Note
 

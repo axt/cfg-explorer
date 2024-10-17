@@ -33,4 +33,4 @@ class CFGExplorer(object):
         return render_template("index.html", start_url ="http://localhost:%d%s" % (self.port, self.start_url))
 
     def run(self):
-        self._app.run(debug=True, use_reloader=False, port=self.port)
+        self._app.run(debug=True, use_reloader=False, port=self.port, host='0.0.0.0')
