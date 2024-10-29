@@ -63,18 +63,18 @@ For example, use [`examples/specrand_base.i386`](./examples/specrand_base.i386) 
 
 ```bash
 docker run -v $(pwd)/examples/specrand_base.i386:/data/binary  \
-    -v $(pwd)/output:/output cfg-explorer /data/binary -l -o /output/cfg.pdf
+    -v $(pwd)/output:/output cfg-explorer /data/binary -o /output/cfg.pdf
 ```
 
 Or let it start a web server and open the browser to view the CFG:
 
 
 ```bash
-docker run -p 8000:5000 -v $(pwd)/examples/specrand_base.i386:/data/binary  \
+docker run -p 5000:5000 -v $(pwd)/examples/specrand_base.i386:/data/binary  \
  cfg-explorer /data/binary
 ```
 
-You can view the CFG in your browser by visiting `http://localhost:8000/api/cfg/0x[entry_address]` according to the output of the command.
+You can view the CFG in your browser by visiting `http://localhost:5000/api/cfg/0x[entry_address]` according to the output of the command.
 
 
 ## Note
