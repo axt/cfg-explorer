@@ -1,0 +1,11 @@
+FROM cfg-explorer:latest
+
+VOLUME [ "/app/input" ]
+
+WORKDIR /app
+EXPOSE 5000
+
+ENTRYPOINT []
+
+CMD ["sh", "-c", "cd /app/input &&  make && cfgexplorer -P 5000 target"]
+

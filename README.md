@@ -77,6 +77,19 @@ docker run -p 5000:5000 -v $(pwd)/examples/specrand_base.i386:/data/binary  \
 You can view the CFG in your browser by visiting `http://localhost:5000/api/cfg/0x[entry_address]` according to the output of the command.
 
 
+Or you can use the quick run image (available as [yangzhou301/cfg-explorer-quickrun](https://hub.docker.com/repository/docker/yangzhou301/cfg-explorer-quickrun/general)) if you don't want to build the binary
+
+```bash
+docker build -t cfg-explorer-quickrun -f Dockerfile.quickrun .
+```
+
+Mount the directory you want to build to `app/input` and set its output as `target`. You can refer to ['examples/helloworld'](./examples/helloworld) for a simple example.
+
+```bash
+docker run -p 5000:5000 -v $(pwd)/examples/helloworld:/app/input cfg-explorer-quickrun
+```
+
+
 ## Note
 
 This project is in its very early stage!
